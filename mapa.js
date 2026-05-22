@@ -10,9 +10,9 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // Exemplo de marcador (opcional - remova se não quiser)
-// L.marker([14.91, -23.50]).addTo(map)
-//     .bindPopup('Embarcação Exemplo<br>Lat: 14.91°<br>Lon: -23.50°')
-//     .openPopup();
+ L.marker([14.91, -23.50]).addTo(map)
+     .bindPopup('Embarcação Exemplo<br>Lat: 14.91°<br>Lon: -23.50°')
+     .openPopup();
 
 // Função de busca (quando clicar no botão)
 document.getElementById('searchBtn').addEventListener('click', function() {
