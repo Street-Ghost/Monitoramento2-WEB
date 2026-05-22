@@ -19,58 +19,5 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // TUDO DENTRO DE UM ÚNICO SCRIPT
-        // Aguarda o DOM carregar completamente
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // 1. CRIAR O MAPA PRIMEIRO
-            var map = L.map('map').setView([14.91, -23.50], 7);
-            
-            // 2. ADICIONAR O TILE LAYER
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
-            
-            // 3. (OPCIONAL) Adicionar um marcador de exemplo
-            L.marker([14.91, -23.50]).addTo(map)
-                .bindPopup('📍 Cabo Verde<br>Coordenadas: 14.91, -23.50')
-                .openPopup();
-            
-            // 4. FUNÇÃO DE BUSCA
-            document.getElementById('searchBtn').addEventListener('click', function() {
-                var codigo = document.getElementById('trackingCode').value;
-                
-                if (codigo) {
-                    alert('Buscando embarcação: ' + codigo + '\n(Conecte sua API aqui)');
-                    console.log('Código buscado:', codigo);
-                    
-                    // Exemplo: centralizar no marcador
-                    // map.setView([14.91, -23.50], 13);
-                    
-                    // Exemplo com API real (descomente quando tiver o backend)
-                    /*
-                    fetch(`http://127.0.0.1:3000/api/barco/${codigo}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            map.setView([data.lat, data.lon], 15);
-                            L.marker([data.lat, data.lon]).addTo(map)
-                                .bindPopup(`Embarcação: ${codigo}`)
-                                .openPopup();
-                        })
-                        .catch(erro => {
-                            alert('Embarcação não encontrada!');
-                        });
-                    */
-                } else {
-                    alert('Digite um código de rastreamento!');
-                }
-            });
-            
-            console.log(' Mapa carregado com sucesso!');
-        });
-    </script>
 </body>
 </html>
