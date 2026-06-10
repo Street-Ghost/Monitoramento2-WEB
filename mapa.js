@@ -14,8 +14,10 @@ let marcadorBarco = null;
 
 // Trajeto percorrido
 let trajeto = [];
-let linhaTrajeto = L.polyline(trajeto, {
-    weight: 3
+let linhaTrajeto = L.polyline(
+    trajeto,
+    {
+    weight: 4
 }).addTo(map);
 
 // Função de busca (quando clicar no botão)
