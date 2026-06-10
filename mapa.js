@@ -9,6 +9,10 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     minZoom: 1
 }).addTo(map);
 
+ L.marker([14.91, -23.50]).addTo(map)
+     .bindPopup('Embarcação Exemplo<br>Lat: 14.91°<br>Lon: -23.50°')
+     .openPopup();
+
  // Marcador de rastreamento
 let marcadorBarco = null;
 
