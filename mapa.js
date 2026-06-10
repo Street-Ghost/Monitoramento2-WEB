@@ -1,127 +1,183 @@
-// Inicializar o mapa (Cabo Verde)
-var map = L.map('map').setView([14.91, -23.50], 7);  // Cabo Verde
+// =============================
+// MAPA INICIAL
+// =============================
 
-// Adicionar o tileLayer do CARTO DB (substituindo OpenStreetMap)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-    minZoom: 1
-}).addTo(map);
+var map = L.map('map').setView([14.91, -23.50], 8);
 
- L.marker([14.91, -23.50]).addTo(map)
-     .bindPopup('Embarcação Exemplo<br>Lat: 14.91°<br>Lon: -23.50°')
-     .openPopup();
+L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    {
+        attribution:
+            '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }
+).addTo(map);
 
- // Marcador de rastreamento
+// =============================
+// VARIÁVEIS DE RASTREAMENTO
+// =============================
+
 let marcadorBarco = null;
 
-// Trajeto percorrido
 let trajeto = [];
+
 let linhaTrajeto = L.polyline(
     trajeto,
     {
-    weight: 4
-}).addTo(map);
-
-// Função de busca (quando clicar no botão)
-document.getElementById('searchBtn').addEventListener('click', function() {
-    const codigo = document.getElementById('trackingCode').value;
-    if (codigo) {
-        console.log('Buscando embarcação:', codigo);
-        // Requisição à sua API
-        fetch(`http://127.0.0.1:3000/api/barco/${codigo}`)
-            .then(res => res.json())
-            .then(data => {
-                map.setView([data.lat, data.lon], 15);
-                
-                if (!marcadorBarco) {
-
-                    marcadorBarco = L.marker(
-                    [data.lat, data.lon]
-                    ).addTo(map);
-
-                } else {
-
-                marcadorBarco.setLatLng([
-                    data.lat,
-                    data.lon
-                    ]);
-                }
-
-                marcadorBarco.bindPopup(
-                    `🚢 Embarcação ${codigo}<br>
-                    📍 Lat: ${data.lat}<br>
-                    📍 Lon: ${data.lon}`
-                );
-
-                trajeto.push([
-                    data.lat,
-                    data.lon
-                ]);
-
-                linhaTrajeto.setLatLngs(trajeto);
-
-                map.setView([
-                    data.lat,
-                    data.lon
-                ], 15);             
-
-            })
-            .catch(erro => {
-                console.error('Erro:', erro);
-                alert('Embarcação não encontrada!');
-            });
-    } else {
-        alert('Digite um código de rastreamento');
+        color: '#0066ff',
+        weight: 4
     }
+).addTo(map);
+
+// =============================
+// ÍCONE DA EMBARCAÇÃO
+// =============================
+
+const barcoIcon = L.icon({
+    iconUrl:
+        'https://cdn-icons-png.flaticon.com/512/2921/2921822.png',
+
+    iconSize: [40, 40],
+
+    iconAnchor: [20, 20],
+
+    popupAnchor: [0, -20]
 });
-function atualizarBarco(codigo) {
 
-    fetch(`http://127.0.0.1:3000/api/barco/${codigo}`)
-        .then(res => res.json())
-        .then(data => {
+// =============================
+// ATUALIZAR GPS
+// =============================
 
-            if (!marcadorBarco) {
+async function atualizarGPS() {
 
-                marcadorBarco = L.marker([
-                    data.lat,
-                    data.lon
-                ]).addTo(map);
+    try {
 
-            } else {
+        const resposta =
+        await fetch(
+            'http://localhost:3000/gps'
+        );
 
-                marcadorBarco.setLatLng([
-                    data.lat,
-                    data.lon
-                ]);
-            }
+        const gps =
+        await resposta.json();
 
-            trajeto.push([
-                data.lat,
-                data.lon
-            ]);
+        if (
+            gps.lat === 0 ||
+            gps.lon === 0
+        ) {
+            return;
+        }
 
-            linhaTrajeto.setLatLngs(
-                trajeto
+        // PRIMEIRA POSIÇÃO
+
+        if (!marcadorBarco) {
+
+            marcadorBarco =
+            L.marker(
+                [
+                    gps.lat,
+                    gps.lon
+                ],
+                {
+                    icon: barcoIcon
+                }
+            ).addTo(map);
+
+            map.setView(
+                [
+                    gps.lat,
+                    gps.lon
+                ],
+                15
             );
+        }
 
-            map.panTo([
-                data.lat,
-                data.lon
-            ]);
-        });
-}
-setInterval(() => {
+        // MOVIMENTAR MARCADOR
 
-    if (codigoAtual) {
+        marcadorBarco.setLatLng(
+            [
+                gps.lat,
+                gps.lon
+            ]
+        );
 
-        atualizarBarco(
-            codigoAtual
+        // POPUP
+
+        marcadorBarco.bindPopup(
+            `
+            <b>🚢 Embarcação Rastreada</b>
+            <br>
+            Latitude: ${gps.lat}
+            <br>
+            Longitude: ${gps.lon}
+            <br>
+            Última atualização:
+            ${new Date().toLocaleTimeString()}
+            `
+        );
+
+        // TRAJETO
+
+        trajeto.push(
+            [
+                gps.lat,
+                gps.lon
+            ]
+        );
+
+        linhaTrajeto.setLatLngs(
+            trajeto
+        );
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao obter GPS:",
+            erro
         );
     }
+}
 
-}, 15000);
+// =============================
+// BOTÃO RASTREAR
+// =============================
 
-// Atualização periódica (se necessário)
-// setInterval(atualizarBarcos, 5000);
+document
+.getElementById('searchBtn')
+.addEventListener(
+    'click',
+    function () {
+
+        const codigo =
+        document
+        .getElementById(
+            'trackingCode'
+        )
+        .value;
+
+        if (!codigo) {
+
+            alert(
+                'Digite um código.'
+            );
+
+            return;
+        }
+
+        alert(
+            'Rastreamento iniciado para: ' +
+            codigo
+        );
+
+        atualizarGPS();
+    }
+);
+
+// =============================
+// ATUALIZAÇÃO AUTOMÁTICA
+// =============================
+
+setInterval(
+    atualizarGPS,
+    1000
+);
