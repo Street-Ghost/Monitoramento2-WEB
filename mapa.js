@@ -26,21 +26,6 @@ let linhaTrajeto = L.polyline(
 ).addTo(map);
 
 // =============================
-// ÍCONE DA EMBARCAÇÃO
-// =============================
-
-const barcoIcon = L.icon({
-    iconUrl:
-        'https://cdn-icons-png.flaticon.com/512/2921/2921822.png',
-
-    iconSize: [40, 40],
-
-    iconAnchor: [20, 20],
-
-    popupAnchor: [0, -20]
-});
-
-// =============================
 // ATUALIZAR GPS
 // =============================
 
