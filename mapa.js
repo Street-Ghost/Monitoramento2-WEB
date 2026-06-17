@@ -25,6 +25,10 @@ let linhaTrajeto = L.polyline(
     }
 ).addTo(map);
 
+
+
+
+
 // =============================
 // ATUALIZAR GPS
 // =============================
@@ -117,6 +121,14 @@ async function atualizarGPS() {
         );
     }
 }
+
+
+
+var popup = L.popup()
+    .setLatLng([14.919, -23.52])
+    .setContent("I am a standalone popup.")
+    .openOn(map);
+
 
 // =============================
 // BOTÃO RASTREAR
